@@ -1,0 +1,4 @@
+ssh       22/tcp
+telnet    23/tcp
+https     443/tcp
+smtp      25/tcp

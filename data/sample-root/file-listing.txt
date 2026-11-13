@@ -1,0 +1,2 @@
+/srv/app/shared-drop
+/var/app/data/public-export.csv

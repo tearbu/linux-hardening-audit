@@ -1,0 +1,2 @@
+# Fictional sudoers fragment - this one is fine (password required).
+%admins ALL=(ALL) ALL

@@ -1,0 +1,7 @@
+# Sample sshd_config (fictional) - seeded with findings on purpose.
+Port 22
+PermitRootLogin yes
+PasswordAuthentication yes
+PubkeyAuthentication yes
+PermitEmptyPasswords no
+X11Forwarding no
