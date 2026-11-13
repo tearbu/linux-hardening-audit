@@ -1,27 +1,17 @@
 # Linux Hardening Audit
 
-A read-only Bash script that checks a Linux host against a small set of
-baseline hardening controls — the ones that appear again and again in
-security reviews and CIS-style benchmarks — and prints each finding with
-a severity and a summary count. It inspects; it never changes anything.
+A read-only Bash script that checks a Linux host against a small set of baseline hardening controls, the ones that appear again and again in security reviews and CIS-style benchmarks, and prints each finding with a severity and a summary count. It inspects; it never changes anything.
 
 ## Why this matters
 
-Most real-world Linux compromises do not start with exotic exploits. They
-start with direct root SSH login left enabled, a passwordless sudo rule
-someone added "temporarily," an account with an empty password, or a
-world-writable file in the wrong place. Baseline configuration drift is
-exactly what system administration, IT operations, and security roles are
-expected to catch. A short, readable script that checks the same controls
-the same way on every host turns that review from an afternoon of manual
-`grep` into a one-command habit.
+Most real-world Linux compromises do not start with exotic exploits. They start with direct root SSH login left enabled, a passwordless sudo rule someone added "temporarily," an account with an empty password, or a world-writable file in the wrong place. Baseline configuration drift is exactly what system administration, IT operations, and security roles are expected to catch. A short, readable script that checks the same controls the same way on every host turns that review from an afternoon of manual `grep` into a one-command habit.
 
 ## What it checks
 
 | Check | Severity | Finding |
 | --- | --- | --- |
 | SSH | High / Medium | `PermitRootLogin` is not `no` |
-| SSH | Medium | `PasswordAuthentication` is `yes` (or unset — it defaults to yes) |
+| SSH | Medium | `PasswordAuthentication` is `yes` (or unset, since it defaults to yes) |
 | SSH | Info | SSH on the default port 22 (noted, not scored as a flaw) |
 | sudo | High | Any `NOPASSWD` rule in `sudoers.d/` |
 | Files | Medium | World-writable files |
@@ -43,22 +33,19 @@ data/sample-root/        # fictional demo tree, seeded with findings
 
 ## How to run
 
-Demo mode — audit the bundled sample tree (no root, no real system files):
+Demo mode: audit the bundled sample tree (no root, no real system files):
 
 ```bash
 ./audit.sh --root data/sample-root
 ```
 
-Live mode — audit the machine you are on (anything missing or unreadable
-is skipped with a note, and the script still exits 0):
+Live mode: audit the machine you are on (anything missing or unreadable is skipped with a note, and the script still exits 0):
 
 ```bash
 sudo ./audit.sh        # sudo lets it read /etc/shadow and sshd_config
 ```
 
-In live mode the world-writable check runs a scoped `find` over common
-directories; in demo mode it reads `file-listing.txt` from the sample
-tree instead, so the demo output is identical on any machine.
+In live mode the world-writable check runs a scoped `find` over common directories; in demo mode it reads `file-listing.txt` from the sample tree instead, so the demo output is identical on any machine.
 
 ## Sample output (actual run, demo mode)
 
@@ -80,19 +67,11 @@ Summary: Critical=1 High=3 Medium=3 Low=0 Info=1 Total=8
 
 ## Limitations (honest ones)
 
-- **A baseline, not a benchmark.** This is a handful of high-signal
-  checks, not a CIS Benchmark implementation — no kernel parameters,
-  auditd rules, PAM stack, firewall, or patch-level review.
-- **Config parsing is textual.** It reads the first uncommented value in
-  `sshd_config` (matching OpenSSH's first-match-wins behavior) but does
-  not evaluate `Match` blocks, included files, or compiled
-  `sshd -T` output, which is the authoritative view.
-- **Live services check is narrow.** Without `--root` it only looks for
-  legacy service units via `systemctl`; it does not scan listening ports.
-- Findings say "look here," not "this is exploitable" — a NOPASSWD rule
-  for a single harmless command and one for `ALL` are reported the same
-  way, and a human still has to judge them.
+- **A baseline, not a benchmark.** This is a handful of high-signal checks, not a CIS Benchmark implementation. No kernel parameters, auditd rules, PAM stack, firewall, or patch-level review.
+- **Config parsing is textual.** It reads the first uncommented value in `sshd_config` (matching OpenSSH's first-match-wins behavior) but does not evaluate `Match` blocks, included files, or compiled `sshd -T` output, which is the authoritative view.
+- **Live services check is narrow.** Without `--root` it only looks for legacy service units via `systemctl`; it does not scan listening ports.
+- Findings say "look here," not "this is exploitable." A NOPASSWD rule for a single harmless command and one for `ALL` are reported the same way, and a human still has to judge them.
 
 ## License
 
-MIT — see [LICENSE](LICENSE). Copyright (c) 2026 Araf Abubakar.
+MIT. See [LICENSE](LICENSE). Copyright (c) 2026 Araf Abubakar.
